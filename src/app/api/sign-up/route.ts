@@ -4,9 +4,8 @@ import { sendVerificationEmail } from '@/utils/sendVerifyEmail';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
-dbConnect();
-
 export const POST = async (req: NextRequest) => {
+    await dbConnect();
     try {
         const { username, email, password } = await req.json();
 
