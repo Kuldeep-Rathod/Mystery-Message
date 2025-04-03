@@ -1,4 +1,4 @@
-import { VerificationEmailTemplate } from '@/components/email-template';
+import { VerificationEmailTemplate } from '@/components/EmailTemplate';
 import { resend } from '@/lib/resend';
 import { ApiResponse } from '@/types/apiResponse';
 

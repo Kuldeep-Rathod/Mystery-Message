@@ -7,6 +7,6 @@ interface AppProps {
     children: React.ReactNode;
 }
 
-export default function App({ children }: AppProps) {
+export default function AuthProvider({ children }: AppProps) {
     return <SessionProvider>{children}</SessionProvider>;
 }
