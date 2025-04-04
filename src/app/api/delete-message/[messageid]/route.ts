@@ -6,13 +6,13 @@ import { authOptions } from '../../auth/[...nextauth]/options';
 
 export const DELETE = async (
     req: NextRequest,
-    { params }: { params: { messageid: string } }
+    { params }: { params: Promise<{ messageid: string }> }
 ) => {
-    const messageId = params.messageid;
+    const { messageid } = await params;
     await dbConnect();
 
     const session = await getServerSession(authOptions);
-    
+
     if (!session || !session.user) {
         return NextResponse.json(
             { success: false, message: 'Not Authenticated' },
@@ -23,7 +23,7 @@ export const DELETE = async (
     try {
         // Find user by email (since that's likely what's in the session)
         const user = await UserModel.findOne({ email: session.user.email });
-        
+
         if (!user) {
             return NextResponse.json(
                 { success: false, message: 'User not found' },
@@ -33,7 +33,7 @@ export const DELETE = async (
 
         // Check if message exists before attempting deletion
         const messageExists = user.messages.some(
-            (msg: any) => msg._id.toString() === messageId
+            (msg: any) => msg._id.toString() === messageid
         );
 
         if (!messageExists) {
@@ -44,8 +44,8 @@ export const DELETE = async (
         }
 
         const updatedResult = await UserModel.updateOne(
-            { _id: user._id, 'messages._id': messageId },
-            { $pull: { messages: { _id: messageId } } }
+            { _id: user._id, 'messages._id': messageid },
+            { $pull: { messages: { _id: messageid } } }
         );
 
         if (updatedResult.modifiedCount === 0) {
