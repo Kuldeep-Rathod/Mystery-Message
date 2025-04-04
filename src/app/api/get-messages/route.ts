@@ -33,7 +33,7 @@ export const GET = async (req: NextRequest) => {
             return NextResponse.json(
                 {
                     success: false,
-                    message: 'User Not Found',
+                    message: 'No Messages yet',
                 },
                 { status: 404 }
             );
