@@ -12,11 +12,11 @@ const Navbar = () => {
     const user: User = session?.user as User;
 
     return (
-        <nav className='p-4 md:p-6 shadow-md bg-gray-900 text-white'>
-            <div className='container mx-auto flex flex-col md:flex-row justify-between items-center'>
+        <nav className='p-4 md:p-6 shadow-md bg-gray-900 text-white border-b'>
+            <div className='container mx-auto flex md:flex-row justify-between items-center'>
                 <a
                     href='#'
-                    className='text-xl font-bold mb-4 md:mb-0'
+                    className='text-lg sm:text-xl font-bold md:mb-0'
                 >
                     Mystery Message
                 </a>
@@ -28,7 +28,7 @@ const Navbar = () => {
                         </span>
                         <Button
                             onClick={() => signOut()}
-                            className='w-full md:w-auto bg-slate-100 text-black'
+                            className=' md:w-auto bg-slate-100 text-black'
                             variant='outline'
                         >
                             Logout
@@ -36,7 +36,9 @@ const Navbar = () => {
                     </>
                 ) : (
                     <Link href={'/sign-in'}>
-                        <Button>Login</Button>
+                        <Button className='border bg-gray-900 hover:bg-gray-500 hover:border'>
+                            Login
+                        </Button>
                     </Link>
                 )}
             </div>

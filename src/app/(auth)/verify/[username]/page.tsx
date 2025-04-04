@@ -59,62 +59,67 @@ const VerifyCodePage = () => {
 
     return (
         <div className='flex justify-center items-center min-h-screen bg-gray-800'>
-            <div className='w-full max-w-md flex flex-col justify-center items-center p-8 space-y-8 bg-white rounded-lg shadow-md'>
-                <div className='text-center'>
-                    <h1 className='text-3xl font-extrabold tracking-tight lg:text-4xl mb-6'>
-                        Verify Your Account
-                    </h1>
-                    <p className='mb-4'>
-                        Enter the verification code sent to your email
-                    </p>
-                </div>
+            {/* Background gradient */}
+            <div className='absolute flex justify-center items-center inset-0 bg-gradient-to-b from-purple-900/20 to-black/80'>
+                <div className='w-full max-w-md flex flex-col justify-center items-center m-4 p-4 sm:p-8 space-y-8 bg-white rounded-lg shadow-md'>
+                    <div className='text-center'>
+                        <h1 className='text-2xl font-bold sm:font-extrabold tracking-tight sm:text-3xl lg:text-4xl mb-6'>
+                            Verify Your Account
+                        </h1>
+                        <p className='text-sm sm:text-lg'>
+                            Enter the verification code sent to your email
+                        </p>
+                    </div>
 
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className='w-2/3 space-y-6 flex flex-col items-center'
-                    >
-                        <FormField
-                            control={form.control}
-                            name='code'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>One-Time Password</FormLabel>
-                                    <FormControl>
-                                        <InputOTP
-                                            maxLength={6}
-                                            {...field}
-                                        >
-                                            <InputOTPGroup>
-                                                <InputOTPSlot index={0} />
-                                                <InputOTPSlot index={1} />
-                                                <InputOTPSlot index={2} />
-                                                <InputOTPSlot index={3} />
-                                                <InputOTPSlot index={4} />
-                                                <InputOTPSlot index={5} />
-                                            </InputOTPGroup>
-                                        </InputOTP>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <Button
-                            type='submit'
-                            disabled={isSubmitting}
-                            className='flex mx-auto'
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(onSubmit)}
+                            className='w-2/3 space-y-6 flex flex-col items-center'
                         >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader className='mx-4 animate-spin' />
-                                </>
-                            ) : (
-                                'Submit'
-                            )}
-                        </Button>
-                    </form>
-                </Form>
+                            <FormField
+                                control={form.control}
+                                name='code'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className='mx-auto'>
+                                            One-Time Password
+                                        </FormLabel>
+                                        <FormControl>
+                                            <InputOTP
+                                                maxLength={6}
+                                                {...field}
+                                            >
+                                                <InputOTPGroup>
+                                                    <InputOTPSlot index={0} />
+                                                    <InputOTPSlot index={1} />
+                                                    <InputOTPSlot index={2} />
+                                                    <InputOTPSlot index={3} />
+                                                    <InputOTPSlot index={4} />
+                                                    <InputOTPSlot index={5} />
+                                                </InputOTPGroup>
+                                            </InputOTP>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <Button
+                                type='submit'
+                                disabled={isSubmitting}
+                                className='flex mx-auto'
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader className='mx-4 animate-spin' />
+                                    </>
+                                ) : (
+                                    'Submit'
+                                )}
+                            </Button>
+                        </form>
+                    </Form>
+                </div>
             </div>
         </div>
     );

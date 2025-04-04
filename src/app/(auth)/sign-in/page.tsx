@@ -63,80 +63,83 @@ const SignInPage = () => {
     };
 
     return (
-        <div className='flex justify-center p-4 items-center min-h-screen bg-gray-800'>
-            <div className='w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md'>
-                <div className='text-center'>
-                    <h1 className='text-3xl font-extrabold tracking-tight lg:text-4xl mb-6'>
-                        Welcome back True Feedback
-                    </h1>
-                    <p className='mb-4'>
-                        Sign in to start your anonymous adventure
-                    </p>
-                </div>
+        <div className='flex justify-center  items-center min-h-screen bg-gray-800'>
+            {/* Background gradient */}
+            <div className='absolute flex justify-center items-center inset-0 bg-gradient-to-b from-purple-900/20 to-black/80'>
+                <div className='w-full max-w-md m-4 p-4 sm:p-8 space-y-8 bg-white rounded-lg shadow-md'>
+                    <div className='text-center'>
+                        <h1 className='text-2xl font-bold sm:font-extrabold tracking-tight sm:text-3xl lg:text-4xl mb-6'>
+                            Welcome back True Feedback
+                        </h1>
+                        <p className='mb-4 text-sm sm:text-lg'>
+                            Sign in to start your anonymous adventure
+                        </p>
+                    </div>
 
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className='space-y-6'
-                    >
-                        <FormField
-                            name='identifier'
-                            control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Username/Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder='Username/Email'
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            name='password'
-                            control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type='password'
-                                            placeholder='Password'
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button
-                            type='submit'
-                            disabled={isSubmitting}
-                            className='flex mx-auto'
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(onSubmit)}
+                            className='space-y-6'
                         >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader className='mx-4 animate-spin' />
-                                </>
-                            ) : (
-                                'Submit'
-                            )}
-                        </Button>
-                    </form>
-                </Form>
-                <div className='text-center mt-4'>
-                    <p>
-                        You don&apos;t have an account?{' '}
-                        <Link
-                            href='/sign-up'
-                            className='text-blue-600 hover:text-blue-800'
-                        >
-                            Sign Up
-                        </Link>
-                    </p>
+                            <FormField
+                                name='identifier'
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username/Email</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder='Username/Email'
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                name='password'
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type='password'
+                                                placeholder='Password'
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button
+                                type='submit'
+                                disabled={isSubmitting}
+                                className='flex mx-auto'
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader className='mx-4 animate-spin' />
+                                    </>
+                                ) : (
+                                    'Submit'
+                                )}
+                            </Button>
+                        </form>
+                    </Form>
+                    <div className='text-center mt-4'>
+                        <p>
+                            You don&apos;t have an account?{' '}
+                            <Link
+                                href='/sign-up'
+                                className='text-blue-600 hover:text-blue-800'
+                            >
+                                Sign Up
+                            </Link>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

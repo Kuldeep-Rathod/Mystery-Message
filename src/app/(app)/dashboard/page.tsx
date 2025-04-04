@@ -9,27 +9,24 @@ import { acceptMessagesSchema } from '@/schemas/acceptMessagesSchema';
 import { ApiResponse } from '@/types/apiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
-import { Loader2, RefreshCcw } from 'lucide-react';
+import {
+    Loader2,
+    RefreshCcw,
+    Copy,
+    Link as LinkIcon,
+    Mail,
+} from 'lucide-react';
 import { useSession } from 'next-auth/react';
-// import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const UserDashboard = () => {
-    // const router = useRouter();
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isSwitchLoading, setIsSwitchLoading] = useState(false);
 
     const { data: session } = useSession();
-
-    // Redirect if not authenticated
-    // useEffect(() => {
-    //     if (!session || !session.user) {
-    //         router.replace('/');
-    //     }
-    // }, [session, router]);
 
     const form = useForm({
         resolver: zodResolver(acceptMessagesSchema),
@@ -70,8 +67,8 @@ const UserDashboard = () => {
             const response = await axios.get<ApiResponse>('/api/get-messages');
             setMessages(response.data.messages || []);
             if (refresh) {
-                toast.success('Refreshed Message', {
-                    description: 'Showing latest message',
+                toast.success('Refreshed Messages', {
+                    description: 'Showing latest messages',
                 });
             }
         } catch (error) {
@@ -98,15 +95,12 @@ const UserDashboard = () => {
                 acceptMessages: !acceptMessages,
             });
             setValue('acceptMessages', !acceptMessages);
-
-            if (!acceptMessages) {
-                toast.success('Message Acceptance is turned ON');
-            } else {
-                toast.error('Message Acceptance is turned OFF');
-            }
+            toast.success(
+                `Messages are now ${!acceptMessages ? 'accepted' : 'not accepted'}`
+            );
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
-            toast('Error', {
+            toast.error('Error', {
                 description:
                     axiosError.response?.data.message ??
                     'Failed to update message settings',
@@ -115,11 +109,18 @@ const UserDashboard = () => {
     };
 
     if (!session || !session.user) {
-        return <div className='text-xl font-sans'>Please Login</div>;
+        return (
+            <div className='flex items-center justify-center min-h-screen text-xl'>
+                Please Login
+            </div>
+        );
     }
 
     const { username } = session.user;
-    const baseUrl = `${window.location.protocol}//${window.location.host}`;
+    const baseUrl =
+        typeof window !== 'undefined'
+            ? `${window.location.protocol}//${window.location.host}`
+            : '';
     const profileUrl = `${baseUrl}/u/${username}`;
 
     const copyToClipboard = () => {
@@ -130,62 +131,116 @@ const UserDashboard = () => {
     };
 
     return (
-        <div className='my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl'>
-            <h1 className='text-4xl font-bold mb-4'>User Dashboard</h1>
+        <div className='bg-gray-900'>
+            <div className='min-h-screen bg-gradient-to-b from-purple-900/20 to-black/80 text-white'>
+                <div className='container mx-auto px-4 py-8 sm:px-6 lg:px-8'>
+                    <div className='space-y-6'>
+                        {/* Header Section */}
+                        <div className='space-y-2'>
+                            <h1 className='text-3xl font-bold sm:text-4xl'>
+                                User Dashboard
+                            </h1>
+                            <p className='text-gray-300'>
+                                Manage your anonymous messages
+                            </p>
+                        </div>
 
-            <div className='mb-4'>
-                <h2 className='text-lg font-semibold mb-2'>
-                    Copy Your Unique Link
-                </h2>
-                <div className='flex items-center'>
-                    <input
-                        type='text'
-                        value={profileUrl}
-                        disabled
-                        className='input input-bordered w-full p-2 mr-2'
-                    />
-                    <Button onClick={copyToClipboard}>Copy</Button>
+                        {/* Profile URL Section */}
+                        <div className='rounded-lg bg-gray-700/50 p-4 backdrop-blur-sm'>
+                            <h2 className='mb-3 text-lg font-semibold'>
+                                Your Unique Link
+                            </h2>
+                            <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+                                <div className='relative flex-1'>
+                                    <LinkIcon className='absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400' />
+                                    <input
+                                        type='text'
+                                        value={profileUrl}
+                                        disabled
+                                        className='w-full rounded-lg border border-gray-700 bg-gray-900/50 py-2 pl-10 pr-4 text-sm text-white focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 sm:text-base'
+                                    />
+                                </div>
+                                <Button
+                                    onClick={copyToClipboard}
+                                    className='flex items-center gap-2 bg-purple-500 hover:bg-purple-600'
+                                >
+                                    <Copy className='h-4 w-4' />
+                                    <span>Copy</span>
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Message Acceptance Toggle */}
+                        <div className='flex items-center justify-between rounded-lg bg-gray-700/50 p-4 backdrop-blur-sm'>
+                            <div>
+                                <h3 className='font-medium'>Accept Messages</h3>
+                                <p className='text-sm text-gray-400'>
+                                    {acceptMessages
+                                        ? 'Your link is active'
+                                        : 'Your link is inactive'}
+                                </p>
+                            </div>
+                            <Switch
+                                {...register('acceptMessages')}
+                                checked={acceptMessages}
+                                onCheckedChange={handleSwitchChange}
+                                disabled={isSwitchLoading}
+                                className='data-[state=checked]:bg-purple-500 data-[state=unchecked]:bg-gray-600'
+                            />
+                        </div>
+
+                        <Separator className='bg-gray-700' />
+
+                        {/* Messages Section */}
+                        <div className='space-y-4 text-white'>
+                            <div className='flex items-center justify-between'>
+                                <h2 className='text-xl font-semibold'>
+                                    Your Messages
+                                </h2>
+                                <Button
+                                    variant='outline'
+                                    onClick={() => fetchMessages(true)}
+                                    disabled={isLoading}
+                                    className='gap-2 hover:text-white border-gray-700 bg-gray-700  hover:bg-gray-800'
+                                >
+                                    {isLoading ? (
+                                        <Loader2 className='h-4 w-4 animate-spin' />
+                                    ) : (
+                                        <RefreshCcw className='h-4 w-4' />
+                                    )}
+                                    <span className='hidden sm:inline'>
+                                        Refresh
+                                    </span>
+                                </Button>
+                            </div>
+
+                            {messages.length > 0 ? (
+                                <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+                                    {messages.map((message) => (
+                                        <MessageCard
+                                            key={message._id as string}
+                                            message={message}
+                                            onMessageDelete={
+                                                handleDeleteMessage
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className='flex flex-col items-center justify-center rounded-lg bg-gray-700/50 p-8 text-center backdrop-blur-sm'>
+                                    <Mail className='mb-4 h-12 w-12 text-gray-400' />
+                                    <h3 className='text-lg font-medium'>
+                                        No messages yet
+                                    </h3>
+                                    <p className='text-gray-400'>
+                                        Share your link to receive anonymous
+                                        messages
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div className='mb-4'>
-                <Switch
-                    {...register('acceptMessages')}
-                    checked={acceptMessages}
-                    onCheckedChange={handleSwitchChange}
-                    disabled={isSwitchLoading}
-                />
-                <span className='ml-2'>
-                    Accept Messages: {acceptMessages ? 'On' : 'Off'}
-                </span>
-            </div>
-            <Separator />
-
-            <Button
-                className='mt-4'
-                variant='outline'
-                onClick={() => fetchMessages(true)}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <Loader2 className='h-4 w-4 animate-spin' />
-                ) : (
-                    <RefreshCcw className='h-4 w-4' />
-                )}
-            </Button>
-
-            <div className='mt-4 grid grid-cols-1 md:grid-cols-2 gap-6'>
-                {messages.length > 0 ? (
-                    messages.map((message) => (
-                        <MessageCard
-                            key={message._id as string}
-                            message={message}
-                            onMessageDelete={handleDeleteMessage}
-                        />
-                    ))
-                ) : (
-                    <p>No messages to display.</p>
-                )}
             </div>
         </div>
     );
