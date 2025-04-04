@@ -36,7 +36,7 @@ export const POST = async (req: NextRequest) => {
 
         return NextResponse.json(
             {
-                seccess: true,
+                success: true,
                 message: 'Message Sent Successfully',
             },
             { status: 200 }
@@ -45,7 +45,7 @@ export const POST = async (req: NextRequest) => {
         console.log('Error Sending Message: ', error);
         return NextResponse.json(
             {
-                seccess: false,
+                success: false,
                 message: 'Error Sending Message',
             },
             { status: 500 }
