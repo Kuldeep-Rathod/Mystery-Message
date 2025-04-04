@@ -52,7 +52,7 @@ const SignInPage = () => {
 
             if (response?.ok) {
                 toast.success('Sign in successful');
-                router.replace('/');
+                router.replace('/dashboard');
             }
         } catch (error) {
             console.error('Sign in error:', error);

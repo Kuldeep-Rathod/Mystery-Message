@@ -11,13 +11,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
 import { Loader2, RefreshCcw } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const UserDashboard = () => {
-    const router = useRouter();
+    // const router = useRouter();
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isSwitchLoading, setIsSwitchLoading] = useState(false);
@@ -25,11 +25,11 @@ const UserDashboard = () => {
     const { data: session } = useSession();
 
     // Redirect if not authenticated
-    useEffect(() => {
-        if (!session || !session.user) {
-            router.replace('/');
-        }
-    }, [session, router]);
+    // useEffect(() => {
+    //     if (!session || !session.user) {
+    //         router.replace('/');
+    //     }
+    // }, [session, router]);
 
     const form = useForm({
         resolver: zodResolver(acceptMessagesSchema),
@@ -70,7 +70,7 @@ const UserDashboard = () => {
             const response = await axios.get<ApiResponse>('/api/get-messages');
             setMessages(response.data.messages || []);
             if (refresh) {
-                toast('Refreshed Message', {
+                toast.success('Refreshed Message', {
                     description: 'Showing latest message',
                 });
             }
@@ -87,22 +87,23 @@ const UserDashboard = () => {
     }, []);
 
     useEffect(() => {
-        if (session?.user) {
-            fetchMessages();
-            fetchAcceptMessages();
-        }
-    }, [session, fetchMessages, fetchAcceptMessages]);
+        if (!session || !session.user) return;
+        fetchMessages();
+        fetchAcceptMessages();
+    }, [session, fetchMessages, fetchAcceptMessages, setValue]);
 
     const handleSwitchChange = async () => {
         try {
-            const response = await axios.post<ApiResponse>(
-                '/api/accept-messages',
-                {
-                    acceptMessages: !acceptMessages,
-                }
-            );
+            await axios.post<ApiResponse>('/api/accept-messages', {
+                acceptMessages: !acceptMessages,
+            });
             setValue('acceptMessages', !acceptMessages);
-            toast(response.data.message);
+
+            if (!acceptMessages) {
+                toast.success('Message Acceptance is turned ON');
+            } else {
+                toast.error('Message Acceptance is turned OFF');
+            }
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
             toast('Error', {
@@ -114,7 +115,7 @@ const UserDashboard = () => {
     };
 
     if (!session || !session.user) {
-        return <div className='text-xl font-sans'>Redirecting...</div>;
+        return <div className='text-xl font-sans'>Please Login</div>;
     }
 
     const { username } = session.user;
@@ -123,7 +124,7 @@ const UserDashboard = () => {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(profileUrl);
-        toast('URL Copied!', {
+        toast.success('URL Copied!', {
             description: 'Profile URL has been copied to clipboard.',
         });
     };

@@ -1,4 +1,4 @@
-import { getServerSession, User } from 'next-auth';
+import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User.model';
@@ -12,47 +12,57 @@ export const DELETE = async (
     await dbConnect();
 
     const session = await getServerSession(authOptions);
-    const user: User = session?.user as User;
-
+    
     if (!session || !session.user) {
         return NextResponse.json(
-            {
-                success: false,
-                message: 'Not Authenticated',
-            },
+            { success: false, message: 'Not Authenticated' },
             { status: 401 }
         );
     }
 
     try {
-        const updatedResult = await UserModel.updateOne(
-            { _id: user._id },
-            { $pull: { messages: { _id: messageId } } }
-        );
-        if (updatedResult.modifiedCount == 0) {
+        // Find user by email (since that's likely what's in the session)
+        const user = await UserModel.findOne({ email: session.user.email });
+        
+        if (!user) {
             return NextResponse.json(
-                {
-                    success: false,
-                    message: 'Already Deleted or Not Found',
-                },
+                { success: false, message: 'User not found' },
                 { status: 404 }
             );
         }
 
+        // Check if message exists before attempting deletion
+        const messageExists = user.messages.some(
+            (msg: any) => msg._id.toString() === messageId
+        );
+
+        if (!messageExists) {
+            return NextResponse.json(
+                { success: false, message: 'Message not found' },
+                { status: 404 }
+            );
+        }
+
+        const updatedResult = await UserModel.updateOne(
+            { _id: user._id, 'messages._id': messageId },
+            { $pull: { messages: { _id: messageId } } }
+        );
+
+        if (updatedResult.modifiedCount === 0) {
+            return NextResponse.json(
+                { success: false, message: 'Failed to delete message' },
+                { status: 400 }
+            );
+        }
+
         return NextResponse.json(
-            {
-                success: true,
-                message: 'Message Deleted',
-            },
+            { success: true, message: 'Message deleted successfully' },
             { status: 200 }
         );
     } catch (error) {
-        console.log('Error to Delete message', error);
+        console.error('Error deleting message:', error);
         return NextResponse.json(
-            {
-                success: false,
-                message: 'Error: Delete Message',
-            },
+            { success: false, message: 'Internal server error' },
             { status: 500 }
         );
     }

@@ -33,10 +33,10 @@ type MessageCardProps = {
 const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
     const handleDeleteConfirm = async () => {
         const response = await axios.delete<ApiResponse>(
-            `/api/delete-msg/${message._id}`
+            `/api/delete-message/${message._id}`
         );
 
-        toast(response.data.message);
+        toast.success(response.data.message);
 
         onMessageDelete(message._id as string);
     };
@@ -45,7 +45,7 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
         <div>
             <Card>
                 <CardHeader className=' flex-row justify-between'>
-                    <CardTitle>Card Title</CardTitle>
+                    <CardTitle>{message.content}</CardTitle>
                     <AlertDialog>
                         <AlertDialogTrigger
                             asChild
