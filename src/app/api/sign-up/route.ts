@@ -11,22 +11,32 @@ export const POST = async (req: NextRequest) => {
 
         const existingVerifiedUserByUsername = await UserModel.findOne({
             username,
-            isVerified: true,
         });
-
-        if (existingVerifiedUserByUsername) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: 'Username is already taken',
-                },
-                { status: 409 }
-            );
-        }
 
         const verifyCode = Math.floor(
             100000 + Math.random() * 900000
         ).toString();
+
+        if (existingVerifiedUserByUsername) {
+            if (existingVerifiedUserByUsername.isVerified) {
+                return NextResponse.json(
+                    {
+                        success: false,
+                        message: 'Username is already taken',
+                    },
+                    { status: 409 }
+                );
+            } else {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                existingVerifiedUserByUsername.email = email;
+                existingVerifiedUserByUsername.password = hashedPassword;
+                existingVerifiedUserByUsername.verifyCode = verifyCode;
+                existingVerifiedUserByUsername.verifyCodeExpiry = new Date(
+                    Date.now() + 10 * 60 * 1000
+                );
+                await existingVerifiedUserByUsername.save();
+            }
+        }
 
         const existingUserByMail = await UserModel.findOne({ email });
 
@@ -38,10 +48,11 @@ export const POST = async (req: NextRequest) => {
                 });
             } else {
                 const hashedPassword = await bcrypt.hash(password, 10);
+                existingUserByMail.username = username;
                 existingUserByMail.password = hashedPassword;
                 existingUserByMail.verifyCode = verifyCode;
                 existingUserByMail.verifyCodeExpiry = new Date(
-                    Date.now() + 600
+                    Date.now() + 10 * 60 * 1000
                 );
                 await existingUserByMail.save();
             }
@@ -72,7 +83,7 @@ export const POST = async (req: NextRequest) => {
             verifyCode
         );
 
-        console.log(emailResponse);
+        // console.log(emailResponse);
 
         if (!emailResponse.success) {
             return NextResponse.json(

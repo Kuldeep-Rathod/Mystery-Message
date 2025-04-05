@@ -19,6 +19,7 @@ import { ApiResponse } from '@/types/apiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
 import { Loader } from 'lucide-react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -52,8 +53,27 @@ const VerifyCodePage = () => {
             toast.error('SignUp Failed', {
                 description: errorMessage,
             });
+            // router.replace(`/sign-up`);
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const onResend = async () => {
+        try {
+            const response = await axios.post<ApiResponse>('/api/resend-code', {
+                username: params.username,
+            });
+            toast.success(response.data.message);
+            // router.replace(`/sign-in`);
+        } catch (error) {
+            console.error('Error in send code', error);
+
+            const axiosError = error as AxiosError<ApiResponse>;
+            const errorMessage = axiosError.response?.data.message;
+            toast.error('SignUp Failed', {
+                description: errorMessage,
+            });
         }
     };
 
@@ -74,7 +94,7 @@ const VerifyCodePage = () => {
                     <Form {...form}>
                         <form
                             onSubmit={form.handleSubmit(onSubmit)}
-                            className='w-2/3 space-y-6 flex flex-col items-center'
+                            className='w-full space-y-6 flex flex-col items-center'
                         >
                             <FormField
                                 control={form.control}
@@ -104,19 +124,35 @@ const VerifyCodePage = () => {
                                 )}
                             />
 
-                            <Button
-                                type='submit'
-                                disabled={isSubmitting}
-                                className='flex mx-auto'
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <Loader className='mx-4 animate-spin' />
-                                    </>
-                                ) : (
-                                    'Submit'
-                                )}
-                            </Button>
+                            <p className='text-sm flex gap-1 justify-center w-full'>
+                                Didn&apos;t get code?{' '}
+                                <span
+                                    onClick={onResend}
+                                    className='text-blue-800'
+                                >
+                                    Resend
+                                </span>
+                            </p>
+
+                            <div className='flex w-full gap-4 justify-between sm:justify-around'>
+                                <Link href={'/sign-up'}>
+                                    <Button className='mx-auto bg-white border text-black hover:bg-gray-200'>
+                                        Cancel
+                                    </Button>
+                                </Link>
+                                <Button
+                                    type='submit'
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader className=' animate-spin' />
+                                        </>
+                                    ) : (
+                                        'Submit'
+                                    )}
+                                </Button>
+                            </div>
                         </form>
                     </Form>
                 </div>
