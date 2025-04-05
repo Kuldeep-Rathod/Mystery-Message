@@ -71,7 +71,7 @@ const PublicLink = () => {
     };
 
     return (
-        <div className='flex flex-col justify-center items-center w-full  mx-4 md:mx-8 lg:mx-auto p-6 bg-gray-900 min-h-screen rounded text-white'>
+        <div className='bg-gray-900 min-h-screen text-white'>
             <div className='absolute inset-0 bg-gradient-to-b from-purple-900/30 to-black/80'>
                 <div className='mb-4 py-12 w-full flex flex-col justify-center items-center'>
                     <h1 className='text-4xl font-bold mb-4'>
@@ -116,7 +116,7 @@ const PublicLink = () => {
                                     <FormItem>
                                         <FormLabel>Rating</FormLabel>
                                         <FormControl>
-                                            <>
+                                            <div>
                                                 <Rating
                                                     name='hover-feedback'
                                                     value={field.value}
@@ -150,7 +150,7 @@ const PublicLink = () => {
                                                         }
                                                     </Box>
                                                 )}
-                                            </>
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

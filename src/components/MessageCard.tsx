@@ -19,11 +19,13 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Star } from 'lucide-react';
 import axios from 'axios';
 import { ApiResponse } from '@/types/apiResponse';
 import { toast } from 'sonner';
 import { Message } from '@/model/User.model';
+import { formatDistanceToNow } from 'date-fns';
+import { Rating } from '@mui/material';
 
 type MessageCardProps = {
     message: Message;
@@ -37,25 +39,29 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
         );
 
         toast.success(response.data.message);
-
         onMessageDelete(message._id as string);
     };
 
+    const createdTimeAgo = formatDistanceToNow(new Date(message.createdAt), {
+        addSuffix: true,
+    });
+
     return (
-        <div>
-            <Card>
-                <CardHeader className=' flex-row justify-between'>
-                    <CardTitle>{message.content}</CardTitle>
+        <Card className=' bg-gray-800 text-white p-4 flex flex-col justify-between shadow-lg rounded-xl border border-gray-700'>
+            <CardHeader className='p-0 mb-2 flex flex-col gap-2 items-stretch'>
+                <div className='flex justify-between items-start'>
+                    <CardTitle className='text-lg font-semibold'>
+                        {message.content}
+                    </CardTitle>
+
                     <AlertDialog>
-                        <AlertDialogTrigger
-                            asChild
-                            className='sticky'
-                        >
+                        <AlertDialogTrigger asChild>
                             <Button
                                 variant='destructive'
-                                className='w-20 h-8 '
+                                size='icon'
+                                className='w-8 h-8'
                             >
-                                <X className=' w-5 h-5' />
+                                <X className='w-4 h-4' />
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -65,8 +71,7 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
                                     This action cannot be undone. This will
-                                    permanently delete your account and remove
-                                    your data from our servers.
+                                    permanently delete this message.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
 
@@ -80,12 +85,23 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
-                    <CardDescription></CardDescription>
-                </CardHeader>
+                </div>
 
-                {/* <CardContent>{formattedDate}</CardContent> */}
-            </Card>
-        </div>
+                {/* Star rating (optional logic) */}
+                <div className='flex items-center '>
+                    <Rating
+                        name='half-rating-read'
+                        defaultValue={message.rating}
+                        precision={0.5}
+                        readOnly
+                    />
+                </div>
+
+                <CardDescription className='text-sm text-gray-400'>
+                    {createdTimeAgo}
+                </CardDescription>
+            </CardHeader>
+        </Card>
     );
 };
 
