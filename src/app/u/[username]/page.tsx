@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/form';
 import { messageSchema } from '@/schemas/messageSchema';
 import { ApiResponse } from '@/types/apiResponse';
+import { grey } from '@mui/material/colors';
 
 const labels: Record<number, string> = {
     0.5: 'Useless',
@@ -70,95 +71,101 @@ const PublicLink = () => {
     };
 
     return (
-        <div className='flex flex-col justify-center items-center w-full my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded'>
-            <div className='mb-4 w-full flex flex-col justify-center items-center'>
-                <h1 className='text-4xl font-bold mb-4'>Public Profile Link</h1>
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className='w-2/3 flex flex-col justify-center space-y-6'
-                    >
-                        {/* Message Field */}
-                        <FormField
-                            name='content'
-                            control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Send Anonymous message to @
-                                        {params.username}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            placeholder='Tell us a little bit about yourself'
-                                            className='resize-none'
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        You can <span>@mention</span> other
-                                        users and organizations.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {/* Rating Field with Labels */}
-                        <FormField
-                            name='rating'
-                            control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Rating</FormLabel>
-                                    <FormControl>
-                                        <>
-                                            <Rating
-                                                name='hover-feedback'
-                                                value={field.value}
-                                                precision={0.5}
-                                                getLabelText={getLabelText}
-                                                onChange={(_, newValue) =>
-                                                    field.onChange(newValue)
-                                                }
-                                                onChangeActive={(_, newHover) =>
-                                                    setHover(newHover)
-                                                }
-                                                emptyIcon={
-                                                    <StarIcon
-                                                        style={{
-                                                            opacity: 0.5,
-                                                        }}
-                                                        fontSize='inherit'
-                                                    />
-                                                }
-                                            />
-                                            {field.value !== null && (
-                                                <Box sx={{ ml: 2 }}>
-                                                    {
-                                                        labels[
-                                                            hover !== -1
-                                                                ? hover
-                                                                : field.value
-                                                        ]
-                                                    }
-                                                </Box>
-                                            )}
-                                        </>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <Button
-                            type='submit'
-                            className='w-fit'
+        <div className='flex flex-col justify-center items-center w-full  mx-4 md:mx-8 lg:mx-auto p-6 bg-gray-900 min-h-screen rounded text-white'>
+            <div className='absolute inset-0 bg-gradient-to-b from-purple-900/30 to-black/80'>
+                <div className='mb-4 py-12 w-full flex flex-col justify-center items-center'>
+                    <h1 className='text-4xl font-bold mb-4'>
+                        Public Profile Link
+                    </h1>
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(onSubmit)}
+                            className='w-2/3 flex flex-col justify-center space-y-6'
                         >
-                            Submit
-                        </Button>
-                    </form>
-                </Form>
+                            {/* Message Field */}
+                            <FormField
+                                name='content'
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Send Anonymous message to @
+                                            {params.username}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder='Tell us a little bit about yourself'
+                                                className='resize-none'
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            You can <span>@mention</span> other
+                                            users and organizations.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Rating Field with Labels */}
+                            <FormField
+                                name='rating'
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Rating</FormLabel>
+                                        <FormControl>
+                                            <>
+                                                <Rating
+                                                    name='hover-feedback'
+                                                    value={field.value}
+                                                    precision={0.5}
+                                                    getLabelText={getLabelText}
+                                                    onChange={(_, newValue) =>
+                                                        field.onChange(newValue)
+                                                    }
+                                                    onChangeActive={(
+                                                        _,
+                                                        newHover
+                                                    ) => setHover(newHover)}
+                                                    emptyIcon={
+                                                        <StarIcon
+                                                            className='text-white'
+                                                            style={{
+                                                                opacity: 0.5,
+                                                            }}
+                                                            fontSize='inherit'
+                                                        />
+                                                    }
+                                                />
+                                                {field.value !== null && (
+                                                    <Box sx={{ ml: 2 }}>
+                                                        {
+                                                            labels[
+                                                                hover !== -1
+                                                                    ? hover
+                                                                    : field.value
+                                                            ]
+                                                        }
+                                                    </Box>
+                                                )}
+                                            </>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <Button
+                                type='submit'
+                                className='w-fit'
+                            >
+                                Submit
+                            </Button>
+                        </form>
+                    </Form>
+                </div>
             </div>
         </div>
     );

@@ -136,7 +136,10 @@ const VerifyCodePage = () => {
 
                             <div className='flex w-full gap-4 justify-between sm:justify-around'>
                                 <Link href={'/sign-up'}>
-                                    <Button className='mx-auto bg-white border text-black hover:bg-gray-200'>
+                                    <Button
+                                        type='button'
+                                        className='mx-auto bg-white border text-black hover:bg-gray-200'
+                                    >
                                         Cancel
                                     </Button>
                                 </Link>
