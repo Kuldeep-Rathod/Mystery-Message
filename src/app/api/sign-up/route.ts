@@ -68,6 +68,8 @@ export const POST = async (req: NextRequest) => {
                 password: hashedPassword,
                 verifyCode,
                 verifyCodeExpiry,
+                resetToken: "",
+                resetTokenExpiry: new Date(),
                 isVerified: false,
                 isAcceptingMessages: true,
                 message: [],
