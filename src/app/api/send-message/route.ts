@@ -6,7 +6,18 @@ import { Message } from '@/model/User.model';
 export const POST = async (req: NextRequest) => {
     await dbConnect();
 
-    const { username, content } = await req.json();
+    const { username, content, rating } = await req.json();
+
+    if (!username || !content || !rating) {
+        return NextResponse.json(
+            {
+                success: false,
+                message: 'Required all fields',
+            },
+            { status: 404 }
+        );
+    }
+
     try {
         const user = await UserModel.findOne({ username });
 
@@ -30,7 +41,7 @@ export const POST = async (req: NextRequest) => {
             );
         }
 
-        const newMessage = { content, createdAt: new Date() };
+        const newMessage = { content, rating, createdAt: new Date() };
         user.messages.push(newMessage as Message);
         await user.save();
 
