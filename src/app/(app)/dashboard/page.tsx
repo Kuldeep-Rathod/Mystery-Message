@@ -4,11 +4,13 @@ import { MessageCard } from '@/components/MessageCard';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
+import { WidgetItem } from '@/components/WidgetItem';
 import { Message } from '@/model/User.model';
 import { acceptMessagesSchema } from '@/schemas/acceptMessagesSchema';
 import { ApiResponse } from '@/types/apiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
+import { error } from 'console';
 import {
     Loader2,
     RefreshCcw,
@@ -17,6 +19,7 @@ import {
     Mail,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { NextResponse } from 'next/server';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -25,6 +28,17 @@ const UserDashboard = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isSwitchLoading, setIsSwitchLoading] = useState(false);
+
+    const [positiveResponse, setPositiveResponse] = useState<number>(0);
+    const [negativeResponse, setNegativeResponse] = useState<number>(0);
+    const [neutralResponse, setNeutralResponse] = useState<number>(0);
+    const [totalResponse, setTotalResponse] = useState<number>(0);
+    const [positivePercent, setPositivePercent] = useState<number>(0);
+    const [negativePercent, setNegativePercent] = useState<number>(0);
+    const [neutralPercent, setNeutralPercent] = useState<number>(0);
+    const [totalPercentageChange, setTotalPercentageChange] =
+        useState<number>(0);
+    const [weeklyTotal, setWeeklyTotal] = useState<number>(0);
 
     const { data: session } = useSession();
 
@@ -83,11 +97,49 @@ const UserDashboard = () => {
         }
     }, []);
 
+    const handleDashboard = useCallback(async () => {
+        try {
+            const response = await axios.get<ApiResponse>('/api/dashboard');
+
+            if (!response.data.MessageStats) {
+                throw new Error('Message statistics is not defined');
+            }
+
+            setPositiveResponse(response.data.MessageStats.totalPositive ?? 0);
+            setNegativeResponse(response.data.MessageStats.totalNegative);
+            setNeutralResponse(response.data.MessageStats.totalNeutral);
+            setTotalResponse(response.data.MessageStats.total);
+            setPositivePercent(response.data.MessageStats.positivePercentage);
+            setNegativePercent(response.data.MessageStats.negativePercentage);
+            setNeutralPercent(response.data.MessageStats.neutralPercentage);
+            setTotalPercentageChange(
+                response.data.MessageStats.totalPercentageChange
+            );
+            setWeeklyTotal(response.data.MessageStats.weeklyTotal);
+
+            console.log('Statistic: ', response.data);
+        } catch (error) {
+            const axiosError = error as AxiosError<ApiResponse>;
+            toast.error('Error', {
+                description:
+                    axiosError.response?.data.message ??
+                    'Failed to fetch statistics',
+            });
+        }
+    }, []);
+
     useEffect(() => {
         if (!session || !session.user) return;
         fetchMessages();
         fetchAcceptMessages();
-    }, [session, fetchMessages, fetchAcceptMessages, setValue]);
+        handleDashboard();
+    }, [
+        session,
+        fetchMessages,
+        fetchAcceptMessages,
+        setValue,
+        handleDashboard,
+    ]);
 
     const handleSwitchChange = async () => {
         try {
@@ -144,6 +196,34 @@ const UserDashboard = () => {
                                 Manage your anonymous messages
                             </p>
                         </div>
+
+                        <section className='flex flex-row justify-between items-start gap-4 flex-wrap py-8 pr-8 pl-0'>
+                            <WidgetItem
+                                percent={positivePercent}
+                                value={positiveResponse}
+                                heading='Positive'
+                                color='rgb(0,115,225)'
+                            />
+                            <WidgetItem
+                                percent={neutralPercent}
+                                value={neutralResponse}
+                                heading='Neutral'
+                                color='rgb(255,196,0)'
+                            />
+                            <WidgetItem
+                                percent={-negativePercent}
+                                value={negativeResponse}
+                                heading='Negative'
+                                color='#ff2323'
+                            />
+
+                            <WidgetItem
+                                percent={totalPercentageChange}
+                                value={weeklyTotal}
+                                heading='Total in this week'
+                                color='#ff54f6'
+                            />
+                        </section>
 
                         {/* Profile URL Section */}
                         <div className='rounded-lg bg-gray-700/50 p-4 backdrop-blur-sm'>
