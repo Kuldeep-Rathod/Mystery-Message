@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -18,61 +18,70 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader } from 'lucide-react';
 import Link from 'next/link';
-import { signInSchema } from '@/schemas/signInSchema';
-import { signIn } from 'next-auth/react';
+import { newPasswordSchema } from '@/schemas/newPasswordSchema';
+import axios, { AxiosError } from 'axios';
+import { ApiResponse } from '@/types/apiResponse';
 
-const SignInPage = () => {
+const SetNewPasswordPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
-
     const router = useRouter();
+    const params = useParams<{ resetToken: string }>();
 
-    //zod implementation
-    const form = useForm<z.infer<typeof signInSchema>>({
-        resolver: zodResolver(signInSchema),
+    const resetToken = params.resetToken;
+
+    console.log('Tokennnnnnnn', resetToken);
+
+    // Initialize the form
+    const form = useForm<z.infer<typeof newPasswordSchema>>({
+        resolver: zodResolver(newPasswordSchema),
         defaultValues: {
-            identifier: '',
             password: '',
+            confirmPassword: '',
         },
     });
 
-    const onSubmit = async (data: z.infer<typeof signInSchema>) => {
+    const onSubmit = async (data: z.infer<typeof newPasswordSchema>) => {
         setIsSubmitting(true);
+
         try {
-            const response = await signIn('credentials', {
-                redirect: false,
-                identifier: data.identifier,
-                password: data.password,
-            });
+            // Call your API endpoint to reset the password
+            const response = await axios.post<ApiResponse>(
+                `/api/reset-password/${resetToken}`,
+                {
+                    resetToken: resetToken,
+                    newPass: data.password,
+                    confirmNewPass: data.confirmPassword,
+                }
+            );
+            console.log('response:', response);
+            console.log('data: ', data);
 
-            if (response?.error) {
-                toast.error(response.error);
-                setIsSubmitting(false);
-                return;
-            }
-
-            if (response?.ok) {
-                toast.success('Sign in successful');
-                router.replace('/dashboard');
-            }
+            toast.success('Password reset successfully');
+            router.replace('/sign-in');
         } catch (error) {
-            console.error('Sign in error:', error);
-            toast.error('An unexpected error occurred');
+            console.error('Password reset error:', error);
+
+            const axiosError = error as AxiosError<ApiResponse>;
+            const errorMessage = axiosError.response?.data.message;
+
+            toast.error('SignUp Failed', {
+                description: errorMessage,
+            });
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className='flex justify-center  items-center min-h-screen bg-gray-800'>
-            {/* Background gradient */}
+        <div className='flex justify-center items-center min-h-screen bg-gray-800'>
             <div className='absolute flex justify-center items-center inset-0 bg-gradient-to-b from-purple-900/20 to-black/80'>
                 <div className='w-full max-w-md m-4 p-4 sm:p-8 space-y-8 bg-white rounded-lg shadow-md'>
                     <div className='text-center'>
                         <h1 className='text-2xl font-bold sm:font-extrabold tracking-tight sm:text-3xl lg:text-4xl mb-6'>
-                            Welcome back True Feedback
+                            Set New Password
                         </h1>
                         <p className='mb-4 text-sm sm:text-lg'>
-                            Sign in to start your anonymous adventure
+                            Enter your new password below
                         </p>
                     </div>
 
@@ -82,31 +91,15 @@ const SignInPage = () => {
                             className='space-y-6'
                         >
                             <FormField
-                                name='identifier'
-                                control={form.control}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username/Email</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder='Username/Email'
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
                                 name='password'
                                 control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Password</FormLabel>
+                                        <FormLabel>New Password</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type='password'
-                                                placeholder='Password'
+                                                placeholder='Enter new password'
                                                 {...field}
                                             />
                                         </FormControl>
@@ -115,38 +108,49 @@ const SignInPage = () => {
                                 )}
                             />
 
-                            <p className='text-sm flex gap-1 justify-end w-full'>
-                                <Link
-                                    href={'/reset-password'}
-                                    className='text-blue-600 hover:text-blue-800'
-                                >
-                                    Forgot Password?
-                                </Link>
-                            </p>
+                            <FormField
+                                name='confirmPassword'
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Confirm Password</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type='password'
+                                                placeholder='Confirm new password'
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
                             <Button
                                 type='submit'
                                 disabled={isSubmitting}
-                                className='flex mx-auto'
+                                className='flex mx-auto w-full'
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <Loader className='mx-4 animate-spin' />
+                                        <Loader className='mr-2 h-4 w-4 animate-spin' />
+                                        Updating...
                                     </>
                                 ) : (
-                                    'Submit'
+                                    'Reset Password'
                                 )}
                             </Button>
                         </form>
                     </Form>
 
                     <div className='text-center mt-4'>
-                        <p>
-                            You don&apos;t have an account?{' '}
+                        <p className='text-sm'>
+                            Remembered your password?{' '}
                             <Link
-                                href='/sign-up'
+                                href='/sign-in'
                                 className='text-blue-600 hover:text-blue-800'
                             >
-                                Sign Up
+                                Sign In
                             </Link>
                         </p>
                     </div>
@@ -156,4 +160,4 @@ const SignInPage = () => {
     );
 };
 
-export default SignInPage;
+export default SetNewPasswordPage;

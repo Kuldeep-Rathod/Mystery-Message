@@ -14,18 +14,20 @@ const Navbar = () => {
     return (
         <nav className='p-4 md:p-6 shadow-md bg-gray-900 text-white border-b'>
             <div className='container mx-auto flex md:flex-row justify-between items-center'>
-                <a
-                    href='#'
+                <Link
+                    href='/'
                     className='text-lg sm:text-xl font-bold md:mb-0'
                 >
                     Mystery Message
-                </a>
+                </Link>
                 {session ? (
                     <>
                         {' '}
-                        <span className='mr-4'>
-                            Wlcome, {user.username || user.email}
-                        </span>
+                        <Link href={'/dashboard'}>
+                            <span className='mr-4'>
+                                Wlcome, {user.username || user.email}
+                            </span>
+                        </Link>
                         <Button
                             onClick={() => signOut()}
                             className=' md:w-auto bg-slate-100 text-black'

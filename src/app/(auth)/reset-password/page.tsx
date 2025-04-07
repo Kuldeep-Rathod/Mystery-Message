@@ -20,43 +20,40 @@ import { Loader } from 'lucide-react';
 import Link from 'next/link';
 import { signInSchema } from '@/schemas/signInSchema';
 import { signIn } from 'next-auth/react';
+import { resetPasswordSchema } from '@/schemas/resetPasswordSchema';
+import axios, { AxiosError } from 'axios';
+import { ApiResponse } from '@/types/apiResponse';
 
 const SignInPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
-
     const router = useRouter();
 
     //zod implementation
-    const form = useForm<z.infer<typeof signInSchema>>({
-        resolver: zodResolver(signInSchema),
+    const form = useForm<z.infer<typeof resetPasswordSchema>>({
+        resolver: zodResolver(resetPasswordSchema),
         defaultValues: {
-            identifier: '',
-            password: '',
+            username: '',
         },
     });
 
-    const onSubmit = async (data: z.infer<typeof signInSchema>) => {
+    const onSubmit = async (data: z.infer<typeof resetPasswordSchema>) => {
         setIsSubmitting(true);
+
         try {
-            const response = await signIn('credentials', {
-                redirect: false,
-                identifier: data.identifier,
-                password: data.password,
-            });
+            const response = await axios.post<ApiResponse>(
+                '/api/reset-password',
+                data
+            );
 
-            if (response?.error) {
-                toast.error(response.error);
-                setIsSubmitting(false);
-                return;
-            }
-
-            if (response?.ok) {
-                toast.success('Sign in successful');
-                router.replace('/dashboard');
-            }
+            toast.success(response.data.message);
         } catch (error) {
-            console.error('Sign in error:', error);
-            toast.error('An unexpected error occurred');
+            console.error('Error in signup user', error);
+
+            const axiosError = error as AxiosError<ApiResponse>;
+            const errorMessage = axiosError.response?.data.message;
+            toast.error('Failed to send Reset Link', {
+                description: errorMessage,
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -69,10 +66,10 @@ const SignInPage = () => {
                 <div className='w-full max-w-md m-4 p-4 sm:p-8 space-y-8 bg-white rounded-lg shadow-md'>
                     <div className='text-center'>
                         <h1 className='text-2xl font-bold sm:font-extrabold tracking-tight sm:text-3xl lg:text-4xl mb-6'>
-                            Welcome back True Feedback
+                            Reset Your Password
                         </h1>
                         <p className='mb-4 text-sm sm:text-lg'>
-                            Sign in to start your anonymous adventure
+                            Enter your email to receive a reset link
                         </p>
                     </div>
 
@@ -82,31 +79,14 @@ const SignInPage = () => {
                             className='space-y-6'
                         >
                             <FormField
-                                name='identifier'
+                                name='username'
                                 control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Username/Email</FormLabel>
+                                        <FormLabel>Username</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder='Username/Email'
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                name='password'
-                                control={form.control}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Password</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type='password'
-                                                placeholder='Password'
+                                                placeholder='Enter your username here'
                                                 {...field}
                                             />
                                         </FormControl>
@@ -115,38 +95,31 @@ const SignInPage = () => {
                                 )}
                             />
 
-                            <p className='text-sm flex gap-1 justify-end w-full'>
-                                <Link
-                                    href={'/reset-password'}
-                                    className='text-blue-600 hover:text-blue-800'
-                                >
-                                    Forgot Password?
-                                </Link>
-                            </p>
                             <Button
                                 type='submit'
                                 disabled={isSubmitting}
-                                className='flex mx-auto'
+                                className='flex mx-auto w-full'
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <Loader className='mx-4 animate-spin' />
+                                        <Loader className='mr-2 h-4 w-4 animate-spin' />
+                                        Sending...
                                     </>
                                 ) : (
-                                    'Submit'
+                                    'Send Reset Link'
                                 )}
                             </Button>
                         </form>
                     </Form>
 
                     <div className='text-center mt-4'>
-                        <p>
-                            You don&apos;t have an account?{' '}
+                        <p className='text-sm'>
+                            Remembered your password?{' '}
                             <Link
-                                href='/sign-up'
+                                href='/sign-in'
                                 className='text-blue-600 hover:text-blue-800'
                             >
-                                Sign Up
+                                Sign In
                             </Link>
                         </p>
                     </div>

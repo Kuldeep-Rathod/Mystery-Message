@@ -19,7 +19,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { X, Star } from 'lucide-react';
+import { X } from 'lucide-react';
 import axios from 'axios';
 import { ApiResponse } from '@/types/apiResponse';
 import { toast } from 'sonner';
