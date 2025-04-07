@@ -74,6 +74,10 @@ export const authOptions: AuthOptions = {
     },
     session: {
         strategy: 'jwt',
+        maxAge: 30 * 60,
+    },
+    jwt: {
+        maxAge: 30 * 60, // Should match session maxAge
     },
     secret: process.env.NEXTAUTH_SECRET,
 };
