@@ -58,7 +58,7 @@ const MsgStatististics = () => {
 
     return (
         <>
-            <section className='flex flex-row justify-between items-start gap-4 flex-wrap'>
+            <section className='flex flex-row justify-center sm:justify-evenly lg:justify-between items-start gap-4 flex-wrap'>
                 <WidgetItem
                     percent={positivePercent}
                     value={positiveResponse}
