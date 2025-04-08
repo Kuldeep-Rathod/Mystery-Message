@@ -5,6 +5,7 @@ import { signOut, useSession } from 'next-auth/react';
 import React from 'react';
 import { Button } from './ui/button';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const Navbar = () => {
     const { data: session } = useSession();
@@ -12,13 +13,18 @@ const Navbar = () => {
     const user: User = session?.user as User;
 
     return (
-        <nav className='p-4 md:p-6 shadow-md bg-gray-900 text-white border-b'>
+        <nav className='p-1 md:p-2 shadow-md bg-gray-900 text-white border-b'>
             <div className='container mx-auto flex md:flex-row justify-between items-center'>
                 <Link
                     href='/'
                     className='text-lg sm:text-xl font-bold md:mb-0'
                 >
-                    Mystery Message
+                    <Image
+                        src={`/logo.png`}
+                        alt={'logo'}
+                        width='64'
+                        height='32'
+                    />
                 </Link>
                 {session ? (
                     <>
