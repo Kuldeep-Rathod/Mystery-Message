@@ -39,7 +39,7 @@ const MsgStatististics = () => {
             setTotalPercentageChange(stats.totalPercentageChange);
             setWeeklyTotal(stats.weeklyTotal);
 
-            console.log('Statistic: ', response.data);
+            // console.log('Statistic: ', response.data);
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
             toast.error('Error', {

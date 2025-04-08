@@ -50,14 +50,11 @@ export async function GET(req: NextRequest) {
         const currentWeekMessages = user.messages.filter(
             (message) => new Date(message.createdAt) >= oneWeekAgo
         );
-        console.log('current: ', currentWeekMessages.length);
 
         const lastWeekMessages = user.messages.filter((message) => {
             const messageDate = new Date(message.createdAt);
             return messageDate < oneWeekAgo && messageDate >= twoWeekAgo;
         });
-
-        console.log('last: ', lastWeekMessages.length);
 
         // Initialize counters
         let weeklyPositive = 0;

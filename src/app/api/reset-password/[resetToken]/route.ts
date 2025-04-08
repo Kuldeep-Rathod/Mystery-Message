@@ -7,9 +7,6 @@ export const POST = async (req: NextRequest) => {
     await dbConnect();
     try {
         const { resetToken, newPass, confirmNewPass } = await req.json();
-        console.log('reset Tken: ', resetToken);
-        console.log('newPass: ', newPass);
-        console.log('confirmNewPass: ', confirmNewPass);
 
         if (newPass !== confirmNewPass) {
             return NextResponse.json(

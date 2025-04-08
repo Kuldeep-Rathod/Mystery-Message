@@ -25,8 +25,6 @@ export const POST = async (req: NextRequest) => {
         const token = uuid();
         const tokenExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
-        console.log(token);
-
         user.resetToken = token;
         user.resetTokenExpiry = tokenExpiry;
         await user.save();

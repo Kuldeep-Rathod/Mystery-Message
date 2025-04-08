@@ -51,7 +51,6 @@ const SignUpPage = () => {
                     const response = await axios.get(
                         `/api/check-uname-unique?username=${username}`
                     );
-                    console.log(response);
                     setUsernameMessage(response.data.message);
                 } catch (error) {
                     const axiosError = error as AxiosError<ApiResponse>;

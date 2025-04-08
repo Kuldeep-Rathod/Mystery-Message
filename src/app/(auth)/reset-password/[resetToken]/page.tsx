@@ -29,8 +29,6 @@ const SetNewPasswordPage = () => {
 
     const resetToken = params.resetToken;
 
-    console.log('Tokennnnnnnn', resetToken);
-
     // Initialize the form
     const form = useForm<z.infer<typeof newPasswordSchema>>({
         resolver: zodResolver(newPasswordSchema),
@@ -53,8 +51,6 @@ const SetNewPasswordPage = () => {
                     confirmNewPass: data.confirmPassword,
                 }
             );
-            console.log('response:', response);
-            console.log('data: ', data);
 
             toast.success('Password reset successfully');
             router.replace('/sign-in');
